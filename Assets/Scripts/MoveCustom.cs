@@ -7,6 +7,12 @@ using UnityEngine;
 
 public class MoveCustom : MonoBehaviour
 {
+    //A developer only boolean for if we should be in third person or not
+    public bool thirdPerson;
+
+    public Transform firstPersonCameraTransform;
+    public Transform thirdPersonCameraTransform;
+
     //How fast we should move when walking
     public float walkSpeed;
     //How fast we should move when running
@@ -37,6 +43,10 @@ public class MoveCustom : MonoBehaviour
     {
         //Get the rigidbody component and save it in the variable
         rb = GetComponent<Rigidbody>();
+
+        //Lock the mouse cursor and turn it invisible
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
@@ -89,6 +99,23 @@ public class MoveCustom : MonoBehaviour
 
     private void Move(Vector3 movement)
     {
+        if (thirdPerson)
+        {
+            movement = thirdPersonCameraTransform.TransformDirection(movement);
+
+            Vector3 facingDirection = new Vector3(movement.x, 0, movement.z);
+            transform.LookAt(facingDirection);
+        }
+
+        else    //If we are NOT in third person
+        {
+            //Match the left-right rotation of the camera
+            transform.localEulerAngles = new Vector3(0, firstPersonCameraTransform.localEulerAngles.y, 0);
+
+            //Take our "global" movement direction and convert it to a "local" direction
+            movement = transform.TransformDirection(movement);
+        }
+
         //Set our rigidbody's velocity using the incoming movement value
         rb.velocity = movement;
     }
