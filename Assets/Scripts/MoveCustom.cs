@@ -7,8 +7,7 @@ using UnityEngine;
 
 public class MoveCustom : MonoBehaviour
 {
-    //A developer only boolean for if we should be in third person or not
-    public bool thirdPerson;
+    [SerializeField] private CameraMode currentCameraMode;
 
     public Transform firstPersonCameraTransform;
     public Transform thirdPersonCameraTransform;
@@ -43,10 +42,6 @@ public class MoveCustom : MonoBehaviour
     {
         //Get the rigidbody component and save it in the variable
         rb = GetComponent<Rigidbody>();
-
-        //Lock the mouse cursor and turn it invisible
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     void Update()
@@ -99,12 +94,12 @@ public class MoveCustom : MonoBehaviour
 
     private void Move(Vector3 movement)
     {
-        if (thirdPerson)
+        if (currentCameraMode == CameraMode.ThirdPerson)
         {
             movement = thirdPersonCameraTransform.TransformDirection(movement);
 
             Vector3 facingDirection = new Vector3(movement.x, 0, movement.z);
-            transform.LookAt(facingDirection);
+            transform.forward = facingDirection;
         }
 
         else    //If we are NOT in third person
@@ -124,5 +119,10 @@ public class MoveCustom : MonoBehaviour
     {
         //Return the result of a raycast (true or false)
         return Physics.Raycast(transform.position, Vector3.down, 1.05f, groundedMask);
+    }
+
+    public void SetCamera(CameraMode mode)
+    {
+        currentCameraMode = mode;
     }
 }
